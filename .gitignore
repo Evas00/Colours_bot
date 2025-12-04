@@ -1,0 +1,29 @@
+# СЕКРЕТНЫЕ ФАЙЛЫ - НИКОГДА НЕ ЗАЛИВАТЬ!
+.env
+.env.local
+*.env
+secrets.txt
+config.ini
+
+# ПАПКИ PYTHON - создаются автоматически
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+
+# СИСТЕМНЫЕ ФАЙЛЫ
+.DS_Store       # Mac
+Thumbs.db       # Windows
+desktop.ini
+
+# НАСТРОЙКИ IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ЛОГИ И ВРЕМЕННЫЕ ФАЙЛЫ
+*.log
+*.tmp
+*.temp
