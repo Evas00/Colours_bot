@@ -23,8 +23,6 @@ def main():
     
     # Регистрируем обработчики
     app.add_handler(CommandHandler("start", Handlers.start))
-    app.add_handler(CommandHandler("help", Handlers.help_cmd))
-    # Убрали CommandHandler("status", Handlers.check_api_status)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, Handlers.handle_text))
     
     # Запускаем

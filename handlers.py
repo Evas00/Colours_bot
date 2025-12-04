@@ -22,13 +22,6 @@ class Handlers:
         )
     
     @staticmethod
-    async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработка /help"""
-        text = """📚 *Color Bot - ТОЛЬКО реальные API*"""
-        
-        await update.message.reply_text(text, parse_mode='Markdown')
-    
-    @staticmethod
     async def show_trending(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Показать трендовые цвета - ТОЛЬКО из API"""
         await update.message.reply_text("🔄 Получаю цвета...")
@@ -45,8 +38,7 @@ class Handlers:
         message = "🎨 *Топ цвета:*\n\n"
         for i in range(0, len(colors), 5):
             batch = colors[i:i+5]
-            message += " ".join([f"🟥{c}" for c in batch]) + "\n"
-            message += f"`{' '.join(batch)}`\n\n"
+            message += " ".join([f"🟥{c}" for c in batch]) + "\n\n"
         
         await update.message.reply_text(message, parse_mode='Markdown')
     
@@ -67,8 +59,7 @@ class Handlers:
         message = "🔥 *Популярные палитры:*\n\n"
         for i, palette in enumerate(palettes, 1):
             message += f"*Палитра #{i}*\n"
-            message += " ".join([f"🟥{c}" for c in palette]) + "\n"
-            message += f"`{' '.join(palette)}`\n\n"
+            message += " ".join([f"🟥{c}" for c in palette]) + "\n\n"
         
         await update.message.reply_text(message, parse_mode='Markdown')
     
@@ -88,7 +79,6 @@ class Handlers:
         
         message = "💡 *Случайная палитра:*\n\n"
         message += " ".join([f"🟥{c}" for c in palette]) + "\n\n"
-        message += f"`{' '.join(palette)}`\n\n"
         
         await update.message.reply_text(message, parse_mode='Markdown')
     
@@ -103,9 +93,7 @@ class Handlers:
             await Handlers.show_palettes(update, context)
         elif text == "💡 Случайная палитра":
             await Handlers.show_random(update, context)
-        # Убрали проверку на "🔄 Проверить API"
         else:
             await update.message.reply_text(
-                "Используйте кнопки или команды\n"
-                "Напишите /help для справки"
+                "Используйте кнопки или команды"
             )
