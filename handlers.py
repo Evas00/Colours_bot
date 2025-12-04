@@ -10,7 +10,7 @@ class Handlers:
         """Обработка /start"""
         keyboard = [
             ["🎨 Трендовые цвета", "🔥 Популярные палитры"],
-            ["💡 Случайная палитра", "🔄 Проверить API"]
+            ["💡 Случайная палитра"]  # Убрали "🔄 Проверить API"
         ]
         
         text = """🎨 *Добро пожаловать в Color Bot!*
@@ -49,34 +49,6 @@ _Если API недоступны - бот покажет ошибку_
         await update.message.reply_text(text, parse_mode='Markdown')
     
     @staticmethod
-    async def check_api_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Проверить статус API"""
-        await update.message.reply_text("🔍 Проверяю доступность API...")
-        
-        github_status = await ColorAPIClient.get_github_colors()
-        palettes_status = await ColorAPIClient.get_color_palettes()
-        
-        text = "*Статус API:*\n\n"
-        
-        if github_status:
-            text += "✅ GitHub Colors API - работает\n"
-            text += f"   Доступно цветов: {len(github_status)}\n"
-        else:
-            text += "❌ GitHub Colors API - недоступен\n"
-        
-        text += "\n"
-        
-        if palettes_status:
-            text += "✅ Nice Color Palettes API - работает\n"
-            text += f"   Доступно палитр: {len(palettes_status)}\n"
-        else:
-            text += "❌ Nice Color Palettes API - недоступен\n"
-        
-        text += "\n_Попробуйте позже, если API недоступны_"
-        
-        await update.message.reply_text(text, parse_mode='Markdown')
-    
-    @staticmethod
     async def show_trending(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Показать трендовые цвета - ТОЛЬКО из API"""
         await update.message.reply_text("🔄 Получаю цвета из GitHub API...")
@@ -86,7 +58,7 @@ _Если API недоступны - бот покажет ошибку_
         if not colors:
             await update.message.reply_text(
                 "❌ GitHub Colors API временно недоступен\n\n"
-                "Попробуйте позже или нажмите '🔄 Проверить API'"
+                "Попробуйте позже"
             )
             return
         
@@ -109,7 +81,7 @@ _Если API недоступны - бот покажет ошибку_
         if not palettes:
             await update.message.reply_text(
                 "❌ Nice Color Palettes API временно недоступен\n\n"
-                "Попробуйте позже или нажмите '🔄 Проверить API'"
+                "Попробуйте позже"
             )
             return
         
@@ -133,7 +105,7 @@ _Если API недоступны - бот покажет ошибку_
             await update.message.reply_text(
                 "❌ Все API временно недоступны\n\n"
                 "Не удалось получить данные ни из одного источника.\n"
-                "Проверьте статус API или попробуйте позже."
+                "Попробуйте позже."
             )
             return
         
@@ -155,8 +127,7 @@ _Если API недоступны - бот покажет ошибку_
             await Handlers.show_palettes(update, context)
         elif text == "💡 Случайная палитра":
             await Handlers.show_random(update, context)
-        elif text == "🔄 Проверить API":
-            await Handlers.check_api_status(update, context)
+        # Убрали проверку на "🔄 Проверить API"
         else:
             await update.message.reply_text(
                 "Используйте кнопки или команды\n"
