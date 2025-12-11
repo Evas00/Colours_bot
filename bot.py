@@ -15,7 +15,6 @@ def main():
     """Запуск бота"""
     if not Config.BOT_TOKEN:
         print("❌ Ошибка: BOT_TOKEN не найден")
-        print("Создайте .env файл с BOT_TOKEN=ваш_токен")
         return
     
     # Создаем приложение

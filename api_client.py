@@ -20,14 +20,16 @@ class ColorAPIClient:
     @staticmethod
     async def get_github_colors():
         """Получить цвета GitHub ТОЛЬКО из API"""
+        # Получаем данные из API
         data = await ColorAPIClient.fetch_json(Config.GITHUB_COLORS)
         if not data:
-            return None  # Никаких fallback!
+            return None
             
         colors = []
+        # data.items() возвращает пары (ключ, значение)
         for lang, info in data.items():
             if info and 'color' in info and info['color']:
-                color = info['color'].strip()
+                color = info['color'].strip()   # Убираем пробелы
                 if color.startswith('#') and len(color) == 7:
                     colors.append(color)
             if len(colors) >= Config.MAX_COLORS:
@@ -38,8 +40,9 @@ class ColorAPIClient:
     async def get_color_palettes():
         """Получить цветовые палитры ТОЛЬКО из API"""
         data = await ColorAPIClient.fetch_json(Config.COLOR_PALETTES)
+        # Проверяем, что данные получены и это список
         if not data or not isinstance(data, list):
-            return None  # Никаких fallback!
+            return None
             
         palettes = []
         for palette in data[:Config.MAX_PALETTES]:
@@ -63,5 +66,4 @@ class ColorAPIClient:
         if colors and len(colors) >= 5:
             return random.sample(colors, 5)
         
-        # Если ни один API не работает - возвращаем None
         return None

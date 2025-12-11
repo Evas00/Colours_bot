@@ -15,6 +15,7 @@ class Handlers:
         
         text = """🎨 *Добро пожаловать в Color Bot!*"""
         
+        # Отправляем приветственное сообщение с клавиатурой
         await update.message.reply_text(
             text,
             reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True),

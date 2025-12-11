@@ -1,8 +1,9 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()   # Загружает переменные из .env файла в окружение ОС
 
+# Класс для хранения конфигурации бота
 class Config:
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     
