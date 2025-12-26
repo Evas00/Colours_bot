@@ -12,3 +12,5 @@ class Config:
     
     MAX_COLORS = 15
     MAX_PALETTES = 3
+
+    DB_PATH = 'data/colors.db'
