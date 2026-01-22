@@ -20,55 +20,33 @@ class User(Base):
     joined_at = Column(DateTime, default=datetime.now)
     
     # Связь с другими таблицами
-    favorites = relationship("Favorite", back_populates="user")
-    history = relationship("History", back_populates="user")
+    favorite_colors = relationship("FavoriteColor", back_populates="user", cascade="all, delete-orphan")
+    favorite_palettes = relationship("FavoritePalette", back_populates="user", cascade="all, delete-orphan")
 
-# Таблица 2: Цвета
-class Color(Base):
-    __tablename__ = 'colors'
-    
-    id = Column(Integer, primary_key=True)
-    hex_code = Column(String(7), unique=True)  # Например: #FF5733
-    name = Column(String(50))
-    source = Column(String(20))  # github или custom
-    
-    # Связь
-    favorites = relationship("Favorite", back_populates="color")
-
-# Таблица 3: Избранное
-class Favorite(Base):
-    __tablename__ = 'favorites'
+# Таблица 2: Избранные цвета
+class FavoriteColor(Base):
+    __tablename__ = 'favorite_colors'
     
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    color_id = Column(Integer, ForeignKey('colors.id'))
+    hex_code = Column(String(7))  # Например: #FF5733
     added_at = Column(DateTime, default=datetime.now)
     
-    # Связи
-    user = relationship("User", back_populates="favorites")
-    color = relationship("Color", back_populates="favorites")
+    # Связь
+    user = relationship("User", back_populates="favorite_colors")
 
-# Таблица 4: Палитры
-class Palette(Base):
-    __tablename__ = 'palettes'
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    colors = Column(String(200))  # Храним цвета через запятую
-    source = Column(String(20))
-    created_at = Column(DateTime, default=datetime.now)
-
-# Таблица 5: История запросов
-class History(Base):
-    __tablename__ = 'history'
+# Таблица 3: Избранные палитры (пока не используется, но оставим)
+class FavoritePalette(Base):
+    __tablename__ = 'favorite_palettes'
     
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    action = Column(String(50))  # Например: 'get_colors', 'get_palette'
-    timestamp = Column(DateTime, default=datetime.now)
+    palette_name = Column(String(100))
+    colors = Column(String(500))  # Храним цвета через запятую
+    added_at = Column(DateTime, default=datetime.now)
     
     # Связь
-    user = relationship("User", back_populates="history")
+    user = relationship("User", back_populates="favorite_palettes")
 
 # Создаем базу данных
 engine = create_engine(f'sqlite:///data/colors.db')
@@ -78,14 +56,8 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 class Database:
-    """Простой класс для работы с базой данных"""
+    """Класс для работы с базой данных"""
     
-    User = User
-    Color = Color
-    Favorite = Favorite
-    Palette = Palette
-    History = History
-
     @staticmethod
     def get_session():
         return Session()
@@ -114,62 +86,54 @@ class Database:
             session.close()
     
     @staticmethod
-    def log_action(user_id, action):
-        """Записываем действие в историю"""
-        session = Session()
-        try:
-            history = History(user_id=user_id, action=action)
-            session.add(history)
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            print(f"Ошибка при логировании: {e}")
-        finally:
-            session.close()
-    
-    @staticmethod
-    def add_favorite(user_id, color_hex):
+    def add_favorite_color(user_id, color_hex):
         """Добавляем цвет в избранное"""
         session = Session()
         try:
-            # Ищем цвет
-            color = session.query(Color).filter_by(hex_code=color_hex).first()
-            if not color:
-                # Создаем новый цвет
-                color = Color(hex_code=color_hex, source='user')
-                session.add(color)
-                session.commit()
-            
-            # Проверяем, нет ли уже в избранном
-            existing = session.query(Favorite).filter_by(
+            # Проверяем, нет ли уже такого цвета у пользователя
+            existing = session.query(FavoriteColor).filter_by(
                 user_id=user_id,
-                color_id=color.id
+                hex_code=color_hex.upper()
             ).first()
             
             if not existing:
-                favorite = Favorite(user_id=user_id, color_id=color.id)
+                favorite = FavoriteColor(user_id=user_id, hex_code=color_hex.upper())
                 session.add(favorite)
                 session.commit()
                 return True
             return False
         except Exception as e:
             session.rollback()
-            print(f"Ошибка при добавлении в избранное: {e}")
+            print(f"Ошибка при добавлении цвета в избранное: {e}")
             return False
         finally:
             session.close()
+    
     @staticmethod
-    def get_user_favorites(user_id):
+    def get_user_favorite_colors(user_id):
         """Получить избранные цвета пользователя"""
         session = Session()
         try:
-            favorites = session.query(Favorite).filter_by(user_id=user_id).all()
-            colors = []
-            for fav in favorites:
-                color = session.query(Color).filter_by(id=fav.color_id).first()
-                if color:
-                    colors.append(color.hex_code)
-            return colors
+            favorites = session.query(FavoriteColor).filter_by(user_id=user_id).order_by(FavoriteColor.added_at.desc()).all()
+            return [fav.hex_code for fav in favorites]
+        finally:
+            session.close()
+    
+    @staticmethod
+    def clear_user_favorites(user_id):
+        """Очистить все избранное пользователя"""
+        session = Session()
+        try:
+            # Удаляем цвета
+            session.query(FavoriteColor).filter_by(user_id=user_id).delete()
+            # Удаляем палитры
+            session.query(FavoritePalette).filter_by(user_id=user_id).delete()
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            print(f"Ошибка при очистке избранного: {e}")
+            return False
         finally:
             session.close()
     
@@ -178,8 +142,8 @@ class Database:
         """Получить статистику пользователя"""
         session = Session()
         try:
-            fav_count = session.query(Favorite).filter_by(user_id=user_id).count()
-            history_count = session.query(History).filter_by(user_id=user_id).count()
-            return fav_count, history_count
+            color_count = session.query(FavoriteColor).filter_by(user_id=user_id).count()
+            palette_count = session.query(FavoritePalette).filter_by(user_id=user_id).count()
+            return color_count, palette_count
         finally:
             session.close()

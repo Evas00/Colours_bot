@@ -13,41 +13,39 @@ logger = logging.getLogger(__name__)
 def main():
     """Запуск бота"""
     if not Config.BOT_TOKEN:
-        print("❌ Ошибка не найден токен бота")
+        print("❌ Ошибка: не найден токен бота")
+        print("Создайте файл .env и добавьте BOT_TOKEN=ваш_токен")
         return
+    
     try:
-        # Создаем приложение с увеличенным таймаутом
-        app = Application.builder()\
-            .token(Config.BOT_TOKEN)\
-            .connect_timeout(10)\
-            .read_timeout(10)\
-            .write_timeout(10)\
-            .pool_timeout(10)\
-            .build()
+        # Создаем приложение
+        app = Application.builder().token(Config.BOT_TOKEN).build()
         
-        # добавляем команды и регистрируем обработчики
+        # Регистрируем команды
         app.add_handler(CommandHandler("start", Handlers.start))
-        app.add_handler(CommandHandler("colors", Handlers.show_colors))
-        app.add_handler(CommandHandler("palettes", Handlers.show_palettes))
-        app.add_handler(CommandHandler("random", Handlers.show_random))
-        app.add_handler(CommandHandler("favorites", Handlers.show_favorites))
-        app.add_handler(CommandHandler("stats", Handlers.show_stats))
+        app.add_handler(CommandHandler("help", Handlers.show_help))
+        app.add_handler(CommandHandler("favorites", Handlers.show_favorites_menu))
+        
+        # Регистрируем обработчик текстовых сообщений
         app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, Handlers.handle_text))
         
-        # Запускаем
-        print("Бот запущен")
+        # Запускаем бота
+        print("✅ Бот запущен")
+        print("🎨 Доступные тематики:")
+        for theme, desc in Config.THEME_DESCRIPTIONS.items():
+            print(f"  • {theme}: {desc}")
+        print("\n🤖 Бот готов к работе...")
         
         app.run_polling()
         
     except Exception as e:
-        print(f"❌ Ошибка при запуске: {type(e).__name__}")
-        print(f"Подробно: {e}")
+        print(f"❌ Ошибка при запуске: {e}")
         
         if "timed out" in str(e).lower():
-            print("\n💡 Совет: Попробуй:")
-            print("1. Запустить бота снова")
-            print("2. Проверить интернет-соединение")
-            print("3. Подождать 5 минут и повторить")
+            print("\n💡 Совет: Попробуйте:")
+            print("1. Проверить интернет-соединение")
+            print("2. Запустить бота снова")
+            print("3. Проверить токен бота в .env файле")
 
 if __name__ == "__main__":
     main()

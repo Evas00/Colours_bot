@@ -1,16 +1,29 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()   # Загружает переменные из .env файла в окружение ОС
+load_dotenv()
 
-# Класс для хранения конфигурации бота
 class Config:
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     
-    GITHUB_COLORS = 'https://cdn.jsdelivr.net/gh/ozh/github-colors@master/colors.json'
-    COLOR_PALETTES = 'https://cdn.jsdelivr.net/gh/Jam3/nice-color-palettes@master/100.json'
+    # Работающие API
+    COLORMIND_API = 'http://colormind.io/api/'
+    COLOR_PALETTES_API = 'https://cdn.jsdelivr.net/gh/Jam3/nice-color-palettes@master/100.json'
     
-    MAX_COLORS = 15
-    MAX_PALETTES = 3
-
+    # Тематики (только названия для отображения)
+    THEMES = ["education", "bank_finance", "games", "health", 
+              "food", "technology", "fashion", "nature"]
+    
+    # Описания для пользователя
+    THEME_DESCRIPTIONS = {
+        "education": "🎓 Образование",
+        "bank_finance": "🏦 Банк/Финансы", 
+        "games": "🎮 Игры",
+        "health": "🏥 Здоровье",
+        "food": "🍕 Еда",
+        "technology": "💻 Технологии",
+        "fashion": "👗 Мода",
+        "nature": "🌿 Природа"
+    }
+    
     DB_PATH = 'data/colors.db'
