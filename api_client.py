@@ -13,6 +13,7 @@ class ColorAPIClient:
     async def fetch_json(url: str, method: str = "GET", data: dict = None):
         """Получить JSON из URL"""
         try:
+            # Начало блока обработки исключений
             async with aiohttp.ClientSession() as session:
                 if method == "POST":
                     async with session.post(url, json=data, timeout=10) as response:
@@ -43,7 +44,7 @@ class ColorAPIClient:
     
     @staticmethod
     async def get_random_palette_from_colormind():
-        """Получить случайную палитру из Colormind (работает!)"""
+        """Получить случайную палитру из Colormind"""
         try:
             data = {"model": "default"}
             response = await ColorAPIClient.fetch_json(
@@ -56,6 +57,7 @@ class ColorAPIClient:
                 colors = []
                 for rgb in response['result'][:5]:  # Берем первые 5 цветов
                     if len(rgb) == 3:
+                        # Конвертация RGB в HEX формат
                         hex_color = f"#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}"
                         colors.append(hex_color)
                 return colors
@@ -66,9 +68,11 @@ class ColorAPIClient:
     
     @staticmethod
     async def get_color_palettes():
-        """Получить цветовые палитры (работает!)"""
+        """Получить цветовые палитры"""
+        # Проверка если кэш пустой
         if ColorAPIClient._palettes_cache is None:
             data = await ColorAPIClient.fetch_json(Config.COLOR_PALETTES_API)
+            # Проверка валидности данных
             if data and isinstance(data, list):
                 ColorAPIClient._palettes_cache = data
                 return data
@@ -83,7 +87,7 @@ class ColorAPIClient:
         
         all_colors = []
         
-        # Метод 1: Пробуем Colormind API (работает!)
+        # Метод 1: Пробуем Colormind API
         colors = await ColorAPIClient.get_random_palette_from_colormind()
         if colors:
             all_colors = colors
@@ -95,6 +99,7 @@ class ColorAPIClient:
                 # Выбираем палитру в зависимости от темы
                 palette_index = Config.THEMES.index(theme) % len(palettes)
                 palette = palettes[palette_index]
+                # Фильтрация и добавление цветов из палитры
                 if isinstance(palette, list):
                     all_colors = [color for color in palette[:5] if isinstance(color, str) and color.startswith('#')]
         
@@ -135,6 +140,7 @@ class ColorAPIClient:
         adjusted = []
         
         for hex_color in colors:
+            # Проверка валидности HEX цвета
             if not hex_color or not hex_color.startswith('#'):
                 adjusted.append(hex_color)
                 continue

@@ -32,6 +32,7 @@ def main():
         # Запускаем бота
         print("✅ Бот запущен")
         print("🎨 Доступные тематики:")
+        # Итерация по всем темам
         for theme, desc in Config.THEME_DESCRIPTIONS.items():
             print(f"  • {theme}: {desc}")
         print("\n🤖 Бот готов к работе...")
