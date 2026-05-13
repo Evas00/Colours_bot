@@ -90,7 +90,6 @@ class Database:
     
     @staticmethod
     def delete_favorite_color(user_id, hex_code):
-        """Удалить один конкретный цвет из избранного"""
         session = Session()
         try:
             deleted = session.query(FavoriteColor).filter_by(
@@ -107,7 +106,6 @@ class Database:
     
     @staticmethod
     def update_favorite_color(user_id, old_hex, new_hex):
-        """Обновить (изменить) цвет в избранном"""
         session = Session()
         try:
             color = session.query(FavoriteColor).filter_by(user_id=user_id, hex_code=old_hex.upper()).first()
