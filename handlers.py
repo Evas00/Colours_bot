@@ -101,7 +101,7 @@ class Handlers:
             context.user_data.pop("awaiting_new_color", None)
             return
         
-        # ========== ВАЖНО: сначала обрабатываем ожидание номера ==========
+        # Логика выбора цвета по номеру
         if "awaiting_color_selection" in context.user_data:
             # Если пользователь ввел HEX вместо номера – предупредить
             if text.startswith("#") and len(text) == 7:
@@ -111,7 +111,6 @@ class Handlers:
                 )
                 return
             
-            # Пытаемся преобразовать в число
             try:
                 index = int(text) - 1
                 action = context.user_data["awaiting_color_selection"]
@@ -136,7 +135,7 @@ class Handlers:
                 await update.message.reply_text("❌ Пожалуйста, введите номер (цифру) из списка.")
             return
         
-        # ========== Ожидание ввода нового HEX-кода ==========
+        # Логика ожидания нового HEX-кода
         if "awaiting_new_color" in context.user_data:
             if text.startswith("#") and len(text) == 7:
                 await Handlers.update_selected_color(update, context, text)
@@ -144,7 +143,7 @@ class Handlers:
                 await update.message.reply_text("❌ Неверный формат HEX-цвета. Нужно #RRGGBB")
             return
         
-        # ========== Добавление нового цвета (если пришел HEX) ==========
+        # Добавление нового цвета
         if text.startswith("#") and len(text) == 7:
             await Handlers.add_color_to_favorites(update, context, text)
             return
