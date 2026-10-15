@@ -1,4 +1,3 @@
-# app/handlers/__init__.py
 from telegram import Update
 from telegram.ext import ContextTypes
 from .start_help import start, show_help
@@ -14,6 +13,7 @@ from .common import (
     get_main_keyboard, get_colors_keyboard, get_favorites_keyboard,
     get_confirm_keyboard, get_cancel_keyboard
 )
+
 
 class Handlers:
     @staticmethod
@@ -72,10 +72,8 @@ class Handlers:
     async def add_color_to_favorites(update: Update, context: ContextTypes.DEFAULT_TYPE, color: str):
         await add_color_to_favorites(update, context, color)
 
-    # ==================== ГЛАВНЫЙ ОБРАБОТЧИК ТЕКСТА ====================
     @staticmethod
     async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        from app.database.db_ops import Database
         from config import Config
 
         text = update.message.text
@@ -120,7 +118,6 @@ class Handlers:
             context.user_data.pop("update_color_old", None)
             context.user_data.pop("awaiting_new_color", None)
         else:
-            # Ожидание номера для удаления/изменения
             if "awaiting_color_selection" in context.user_data:
                 if text.startswith("#") and len(text) == 7:
                     await update.message.reply_text(
@@ -131,10 +128,10 @@ class Handlers:
                 try:
                     index = int(text) - 1
                     action = context.user_data["awaiting_color_selection"]
-                    user = update.effective_user
-                    colors = Database.get_user_favorite_colors(user.id)
+                    container = context.bot_data["container"]
+                    colors = await container.list_colors.execute(update.effective_user.id)
                     if 0 <= index < len(colors):
-                        selected_color = colors[index]
+                        selected_color = colors[index].hex_code
                         if action == "delete":
                             await Handlers.delete_selected_color(update, context, selected_color)
                         elif action == "update":
@@ -151,7 +148,6 @@ class Handlers:
                     await update.message.reply_text("❌ Пожалуйста, введите номер (цифру) из списка.")
                 return
 
-            # Ожидание нового HEX-кода
             if "awaiting_new_color" in context.user_data:
                 if text.startswith("#") and len(text) == 7:
                     await Handlers.update_selected_color(update, context, text)
@@ -159,7 +155,6 @@ class Handlers:
                     await update.message.reply_text("❌ Неверный формат HEX-цвета. Нужно #RRGGBB")
                 return
 
-            # Добавление цвета
             if text.startswith("#") and len(text) == 7:
                 await Handlers.add_color_to_favorites(update, context, text)
                 return
