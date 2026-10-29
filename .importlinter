@@ -1,0 +1,11 @@
+[importlinter]
+root_package = app
+
+[importlinter:contract:layers]
+name = Clean Architecture Layers
+type = layers
+layers =
+    app.handlers
+    app.infrastructure
+    app.application
+    app.domain

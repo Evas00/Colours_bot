@@ -10,7 +10,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 def main():
     if not Config.BOT_TOKEN:
         print("❌ Ошибка: не найден токен бота")
@@ -20,6 +19,7 @@ def main():
     try:
         app = Application.builder().token(Config.BOT_TOKEN).build()
 
+        # Создаём контейнер и кладём его в память бота
         container = Container()
         app.bot_data["container"] = container
 
@@ -27,12 +27,6 @@ def main():
         app.add_handler(CommandHandler("help", Handlers.show_help))
         app.add_handler(CommandHandler("favorites", Handlers.show_favorites_menu))
         app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, Handlers.handle_text))
-
-        print("✅ Бот запущен")
-        print("🎨 Доступные тематики:")
-        for theme, desc in Config.THEME_DESCRIPTIONS.items():
-            print(f"  • {theme}: {desc}")
-        print("\n🤖 Бот готов к работе...")
 
         app.run_polling()
 
@@ -43,7 +37,6 @@ def main():
             print("1. Проверить интернет-соединение")
             print("2. Запустить бота снова")
             print("3. Проверить токен бота в .env файле")
-
 
 if __name__ == "__main__":
     main()
