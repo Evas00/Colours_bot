@@ -5,29 +5,40 @@ from .value_objects import HexCode
 
 
 class FavoriteColorRepository(ABC):
-    """Порт: как хранить любимые цвета. Реализация — снаружи."""
+    """Порт: как хранить любимые цвета."""
     
     @abstractmethod
     async def add(self, user_id: int, color: HexCode) -> bool:
-        """Добавить цвет. True — если добавили, False — если уже есть."""
         pass
     
     @abstractmethod
     async def remove(self, user_id: int, color: HexCode) -> bool:
-        """Удалить цвет. True — если удалили, False — если не было."""
         pass
     
     @abstractmethod
     async def update(self, user_id: int, old: HexCode, new: HexCode) -> bool:
-        """Заменить цвет. True — если заменили."""
         pass
     
     @abstractmethod
     async def list_all(self, user_id: int) -> List[FavoriteColor]:
-        """Получить все цвета пользователя."""
         pass
     
     @abstractmethod
     async def clear(self, user_id: int) -> bool:
-        """Удалить все цвета пользователя."""
+        pass
+
+
+class ActionLogger(ABC):
+    """Порт: для записи действий пользователя (для генерации нагрузки)."""
+    
+    @abstractmethod
+    async def log(self, user_id: int, action_type: str, details: str) -> None:
+        pass
+
+
+class PaletteRepository(ABC):
+    """Порт: для сохранения сгенерированных палитр."""
+    
+    @abstractmethod
+    async def save_palette(self, user_id: int, theme: str, colors: list[str]) -> bool:
         pass

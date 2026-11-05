@@ -10,7 +10,7 @@ async def select_theme(update: Update, context: ContextTypes.DEFAULT_TYPE, theme
 
     await update.message.reply_text(f"🔄 Получаю цвета для {theme_desc}...")
 
-    palette = await container.generate_palette.execute(theme)
+    palette = await container.generate_palette.execute(update.effective_user.id, theme)
 
     if not palette.colors:
         await update.message.reply_text(

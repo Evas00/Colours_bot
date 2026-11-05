@@ -16,6 +16,7 @@ env/
 .DS_Store       # Mac
 Thumbs.db       # Windows
 desktop.ini
+data/
 
 # НАСТРОЙКИ IDE
 .vscode/
